@@ -1,4 +1,4 @@
-# chlorophyll-a estimates from Landsat-8 measurments
+# Lake chlorophyll-a estimates from Landsat-8 measurments
 
 ### About
 This repository contains source code for the following papers:
