@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""retr_chl_rhos_OLI.py
+"""Description:
 This script was used to call the BST model trained by Cao et al. (2020)
 to estimate  chlorophyll-a concentrations in the lakes
 from Landsat-8 rayleigh-corrected reflectance.
