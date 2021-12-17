@@ -1,3 +1,6 @@
+# Zhigang Cao, NIGLAS
+# zgcao@niglas.ac.cn
+
 import joblib
 import os
 import numpy as np
@@ -100,7 +103,7 @@ def image_estimate(data, model, x_scaler, y_scaler):
     # reshape to 2D array
     chl = est.reshape(im_shape)
     # set retrievals with nan inputs to nan
-    # gen a array of nan, if any pixel has nan in axis =1, the sum would be nan
+    # gen a array of nan, if any pixel has nan in axis = 1, the sum would be nan
     # data_2d_sum = np.sum(data, axis=2)
     # for all pixels would mask most of data, the mask would be processed in postprocessing
     chl[chl < 0] = np.nan
@@ -115,7 +118,7 @@ def mask_algae(nc_file):
 
 ###-----------------------------------------MAIN-----------------------------------------####
 # load model and scalers
-rf_model = joblib.load('rf_chl_rrc.json')
+rf_model = joblib.load('rf_chl_rrc_v3.json')
 x_scaler = joblib.load('x_scaler.json')
 y_scaler = joblib.load('y_scaler.json')
 print('RF model and required scalers have been loaded.')
