@@ -1,7 +1,5 @@
 # Lake chlorophyll-a estimates from Landsat TM, ETM+, and OLI measurments in Lake Taihu
 
-The model and scripts would be avaiable soon!
-
 ### About
 This repository contains source code for the following papers:
 
