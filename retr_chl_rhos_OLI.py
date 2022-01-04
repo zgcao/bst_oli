@@ -179,32 +179,32 @@ def apply_model_pixel(bst, rrc, water_mask):
        this is a strategy to save time"""
     print('>>> chlora started at :'+time.strftime('%Y-%m-%d %H:%M:%S'))
     line, col = rrc.shape[1], rrc.shape[2]
-    # make a coarse atmospheric correction
-    rrc = rrc[0:6, :, :] - rrc[6, :, :]    
+    # # make a coarse atmospheric correction
+    # rrc = rrc[0:6, :, :] - rrc[6, :, :]
+    # transform the 3D image to the 2D array
+    rrc = rrc.reshape(7,-1).T
+    # make a simple atmospheric correction: rrc(lambda) - rrc(2201)
+    rrc = rrc[:,0:6] - np.tile(rrc[:,6],(6,1)).T
+    rrc[rrc<=0] = np.nan
     # generate the band ratios and FAI
-    bg = rrc[0, :, :] / rrc[2, :, :]
-    rg = rrc[3, :, :] / rrc[1, :, :]
-    nr = rrc[4, :, :] / rrc[3, :, :]
-    FAI = rrc[4, :, :] - (rrc[3, :, :] + (rrc[5, :, :]-rrc[3, :, :])
+    bg = rrc[:, 0] / rrc[:, 2]
+    rg = rrc[:, 3] / rrc[:, 1]
+    nr = rrc[:, 4] / rrc[:, 3]
+    FAI = rrc[:, 4] - (rrc[:, 3] + (rrc[:, 5]-rrc[:, 3])
                         * (865.0-655.0)/(1609.0-655.0))
-    rrc = np.array([rrc[0, :, :], rrc[1, :, :], rrc[2, :, :],
-                    rrc[3, :, :], rrc[4, :, :], rrc[5, :, :], bg, rg, nr, FAI])
-    chlora = np.full((line, col), np.nan)
-    # only proecss the water pixels
-    idx = np.where(water_mask == 1)
-    line_idx = idx[0]
-    col_idx = idx[1]
-    n_rows = len(line_idx)
-    interval = int(n_rows / 20.0)
-    if interval == 0: interval = 1
-    for i in range(n_rows):
-        row, col = line_idx[i], col_idx[i]
-        dtrain = xgb.DMatrix(np.array([rrc[:, row, col], ]))
-        chlora[row, col] = bst.predict(dtrain)
-        if i % interval == 0:
-            print('Scans %d in %d => %d processed.' % (i, n_rows, i/n_rows * 100))
+    rrc = np.column_stack((rrc, bg, rg, nr, FAI))
+    rrc[np.isnan(rrc)] = -1
+    # predict
+    dtrain = xgb.DMatrix(rrc)
+    chlora = bst.predict(dtrain)
+    idx = np.where(np.isnan(rrc))
+    chlora[idx[1]] = np.nan
+    # remove the minus value 
+    chlora[chlora<0] = np.nan
+    chlora = chlora.reshape(line, col)
     # remove the minus value
     chlora[chlora < 0] = np.nan
+    chlora[water_mask != 1] = np.nan
     print('>>> chlora ended at :' + time.strftime('%Y-%m-%d %H:%M:%S'))
     return chlora
 
