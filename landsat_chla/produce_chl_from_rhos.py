@@ -37,7 +37,7 @@ def plot_chl(nc_file):
         plt.yticks([])
         cbar = plt.colorbar(ticks=range(0, 61, 20), shrink=.95)
         cbar.minorticks_off()
-        cbar.set_label('Chla ($\mu$g/L)', fontsize=12, fontname='Arial')
+        cbar.set_label(r'Chla ($\mu$g/L)', fontsize=12, fontname='Arial')
         plt.tight_layout()
         plt.savefig(png_file, dpi=300)
     return
@@ -69,7 +69,6 @@ def imread_l2(l2path):
         data_ac[:, :, i] = data[:, :, i] - data[:, :, -1]
     # fill neg value to nan
     data_ac[data_ac <= 0] = np.nan
-    # remove clouds and lands using rhos_1600 > 0.0215
     return data_ac
 
 
@@ -109,7 +108,6 @@ def image_estimate(data, model, x_scaler, y_scaler):
     chl[chl < 0] = np.nan
     return chl
 
-
 def mask_algae(nc_file):
     nc = Dataset(nc_file, 'r')
     lat = nc['algae'][:]
@@ -118,9 +116,9 @@ def mask_algae(nc_file):
 
 ###-----------------------------------------MAIN-----------------------------------------####
 # load model and scalers
-rf_model = joblib.load('rf_chl_rrc_v3.json')
-x_scaler = joblib.load('x_scaler.json')
-y_scaler = joblib.load('y_scaler.json')
+rf_model = joblib.load('rf_chl_rrc_v4.json')
+x_scaler = joblib.load('x_scaler_v4.json')
+y_scaler = joblib.load('y_scaler_v4.json')
 print('RF model and required scalers have been loaded.')
 # load image data
 l2_dir = r'K:\Landsat_L2\taihu'
@@ -151,3 +149,4 @@ for i, filename in enumerate(files):
     png_file = os.path.splitext(nc_file)[0] + '.png'
     plot_chl(nc_file)
     print('  >>> Chla plots have been estimated.')
+
